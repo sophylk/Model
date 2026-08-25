@@ -6,10 +6,10 @@ def read_spectra(path: Path) -> list[dict]:
 
     if path.suffix.lower() != ".mzml":
         raise ValueError("mzML file needed")
-    elif not path.exists():
+    if not path.exists():
         raise FileNotFoundError("no file")
 
-    
+  
     scans_info = []
 
     with mzml.read(path) as data:
@@ -23,33 +23,34 @@ def read_spectra(path: Path) -> list[dict]:
                     ["selectedIon"][0]
                 )
 
+
+                scan_id = re.search(r"scan=(\d+)", scan["id"])
+                if scan_id is None:
+                    raise ValueError(f"No scan id: {scan['id']}")
+
+                scan_id = int(scan_id.group(1))
+
+                charge = selected_ion.get("charge state")
+
+                if charge is not None:
+                    charge = int(charge)
+
                 
                 scans_info.append({
-                    "scan_id": int(re.search(r'scan=(\d+)', scan['id']).group(1)),
+                    "scan_id": scan_id,
                     "spectrum_id": scan['id'],
                     "ms_level": scan['ms level'],
                     "precursor_mz": float(selected_ion["selected ion m/z"]),
-                    "charge": selected_ion.get("charge state"),
+                    "charge": charge,
                     "retention_time": float(scan["scanList"]["scan"][0]["scan start time"]),
-
-                    "mz_array": scan['m/z array'].tolist(),
-
-                    "intensity_array": scan['intensity array'].tolist(),
+                    "mz_array": scan['m/z array'],
+                    "intensity_array": scan['intensity array'],
                     "source_file": path.name,
+                    "run_id": path.stem
                 })
 
 
 
     return scans_info
 
-
-
-def extract_scan_id(spectrum_id):
-    
-    pass
-
-
-def parse_spectrum(spectrum, source_file):
-    
-    pass
 
