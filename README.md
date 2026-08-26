@@ -1,1 +1,1 @@
-# Logistic regression for identification chimeric spectrum
+# Logistic regression model for identification chimeric spectrum
