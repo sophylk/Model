@@ -80,3 +80,21 @@ def preprocess_spectrum(spectrum: dict) -> dict:
 
 
     return new_spectrum
+
+
+def preprocess_spectra(spectra: list[dict]) -> list[dict]:
+    if not isinstance(spectra, list):
+        raise TypeError("spectra is not list")
+
+    if not spectra:
+        raise ValueError("spectra list is empty")
+    
+    processed_spectra = []
+
+    for spectrum in spectra:
+        processed_spectrum = preprocess_spectrum(spectrum)
+        processed_spectra.append(processed_spectrum)
+
+    return processed_spectra
+
+
