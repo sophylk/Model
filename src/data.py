@@ -12,7 +12,7 @@ def read_spectra(path: Path) -> list[dict]:
   
     scans_info = []
 
-    with mzml.read(path) as data:
+    with mzml.read(str(path)) as data:
         for scan in data:
             if scan['ms level'] == 2:
 
