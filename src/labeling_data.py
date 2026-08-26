@@ -1,4 +1,3 @@
-from pyteomics import mzml
 from pathlib import Path
 import pandas as pd
 
@@ -8,7 +7,7 @@ def read_xlink_data(path: Path) -> pd.DataFrame:
     path = Path(path)
 
     if path.suffix.lower() != ".csv":
-            raise ValueError("mzML file needed")
+            raise ValueError("csv file needed")
     if not path.exists():
         raise FileNotFoundError("no file")
     
@@ -27,7 +26,8 @@ def read_xlink_data(path: Path) -> pd.DataFrame:
         "Sequence B",
         "Is Decoy",
         "Crosslinker",
-        "Spectrum file path",
+        "Crosslink Type",
+        "Spectrum file path"
     }
 
     
@@ -93,8 +93,8 @@ def filter_crosslinks(data_table: pd.DataFrame, min_score: float = 20.0, min_del
     is_not_decoy = decoy_values.isin({ "false","0","no","n"})
     is_dsso = data_table["crosslinker"].astype("string").str.contains("DSSO", case=False, na=False)
 
-    peptide_a_present = data_table["peptide_a"].notna() & data_table["peptide_a"].str.len() > 0
-    peptide_b_present = data_table["peptide_b"].notna() & data_table["peptide_b"].str.len() > 0
+    peptide_a_present = data_table["peptide_a"].notna() & data_table["peptide_a"].str.len().gt(0)
+    peptide_b_present = data_table["peptide_b"].notna() & data_table["peptide_b"].str.len().gt(0)
     
 
     check = data_table["scan_id"].notna() & data_table["xlinkx_score"].ge(min_score) & data_table["delta_score"].ge(min_delta_score) & is_not_decoy & is_dsso & peptide_a_present & peptide_b_present
@@ -118,7 +118,7 @@ def crosslinked_labels(data_table: pd.DataFrame) -> pd.DataFrame:
 
     for column in extra_columns:
         if column in labels_table.columns:
-            columns.extend(column)
+            columns.append(column)
 
     return labels_table[columns].reset_index(drop=True)
 
